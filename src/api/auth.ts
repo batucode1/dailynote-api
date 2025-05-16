@@ -1,18 +1,14 @@
-import express, { Request, Response, Router } from "express";
-
+import { Request, Response, Router } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../models/User";
 import dotenv from "dotenv";
+import { ErrorResponse, LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from "../types/auth";
 
 dotenv.config();
 const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET_TOKEN!;
-interface RequestBody {
-  email: string;
-  password: string;
-}
-router.post("/register", async (req: Request, res: Response) => {
+
   const { email, password } = req.body;
 
   try {
@@ -33,7 +29,7 @@ router.post("/register", async (req: Request, res: Response) => {
   }
 });
 
-/* router.post("/login", async (req: Request, res: Response) => {
+router.post("/login", async (req: Request<{}, {}, LoginRequest>, res: Response<LoginResponse | ErrorResponse>) => {
   const { email, password } = req.body;
 
   try {
@@ -51,11 +47,11 @@ router.post("/register", async (req: Request, res: Response) => {
       expiresIn: "2d",
     });
 
-    return res.json({ token });
+    return res.json({message: "Login successful", token });
   } catch (err) {
     console.error("Login error:", err);
     return res.status(500).json({ error: "Server error" });
   }
 });
- */
+
 export default router;
