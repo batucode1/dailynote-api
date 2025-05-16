@@ -9,7 +9,6 @@ dotenv.config();
 const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET_TOKEN!;
 
-router.post("/register", async (req: Request<{}, {}, RegisterRequest>, res: Response<RegisterResponse | ErrorResponse>) => {
   const { email, password } = req.body;
 
   try {
