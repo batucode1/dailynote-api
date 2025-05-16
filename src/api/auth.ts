@@ -12,7 +12,7 @@ interface RequestBody {
   email: string;
   password: string;
 }
-router.post("/register", async (req, res) => {
+router.post("/register", async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   try {
@@ -33,7 +33,7 @@ router.post("/register", async (req, res) => {
   }
 });
 
-router.post("/login", async (req: Request, res: Response) => {
+/* router.post("/login", async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   try {
@@ -57,5 +57,5 @@ router.post("/login", async (req: Request, res: Response) => {
     return res.status(500).json({ error: "Server error" });
   }
 });
-
+ */
 export default router;
