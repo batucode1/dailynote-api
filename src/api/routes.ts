@@ -92,7 +92,8 @@ router.post(
     req: Request<{}, {}, DailyNoteRequest>,
     res: Response<DailyNoteResponse | DailyErrorResponse>
   ) => {
-    const userId = (req as AuthenticatedRequest).user.userId;
+    const userId = (req as any).user.userId;
+
     const { content, date, mood, index } = req.body;
 
     if (!content || !date || !mood || index === undefined) {
@@ -116,4 +117,5 @@ router.post(
     }
   }
 );
+
 export default router;

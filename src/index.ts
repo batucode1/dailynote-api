@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use((req, res, next) => {
-  console.log("🔁 Gelen istek:", req.method, req.url);
+  console.log("🔁 Gelen istek:", req.method, req.url, req.body);
   next();
 });
 
@@ -20,5 +20,5 @@ mongoose
   .then(() => console.log("m-MongoDB connected"))
   .catch((error) => console.error("MongoDB connection error", error));
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running on http://10.10.41.172:${PORT}`);
 });

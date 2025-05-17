@@ -9,7 +9,7 @@ import {
 const JWT_SECRET = process.env.JWT_SECRET_TOKEN!;
 
 export default function authMiddleware(
-  req: Request<{}, {}, DailyNoteRequest>,
+  req: Request,
   res: Response<DailyNoteResponse | DailyErrorResponse>,
   next: NextFunction
 ) {
@@ -20,7 +20,8 @@ export default function authMiddleware(
   const token = authHeader.split(" ")[1];
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
+    (req as any).user = decoded;
+    //bela
     next();
   } catch (error) {
     return res.status(401).json({ error: "Geçersiz Token" });
