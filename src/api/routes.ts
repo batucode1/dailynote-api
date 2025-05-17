@@ -28,22 +28,29 @@ router.post(
     req: Request<{}, {}, RegisterRequest>,
     res: Response<RegisterResponse | ErrorResponse>
   ) => {
-    const { email, password } = req.body;
-
     try {
-      const existingUser = await User.findOne({ email });
+      const { email, password } = req.body;
 
+      console.log("📥 Kayıt verisi:", email, password);
+
+      const existingUser = await User.findOne({ email });
       if (existingUser) {
+        console.log("⚠️ Kullanıcı zaten var");
         return res.status(400).json({ error: "User already exists" });
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
       const user = new User({ email, password: hashedPassword });
-      await user.save();
+
+      console.log("💾 Kayıt edilmek istenen kullanıcı:", user);
+
+      await user.save(); // 🔥 Burası çalışmazsa kullanıcı kaydedilmez
+
+      console.log("✅ Kullanıcı veritabanına kaydedildi");
 
       return res.status(201).json({ message: "User created successfully" });
     } catch (err) {
-      console.error("Register error:", err);
+      console.error("❌ Register error:", err);
       return res.status(500).json({ error: "Server error" });
     }
   }
