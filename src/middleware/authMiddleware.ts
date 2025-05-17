@@ -1,12 +1,13 @@
 import jwt from "jsonwebtoken";
 import { NextFunction, Request, Response } from "express";
-
+import dotenv from "dotenv";
+dotenv.config();
 import {
   DailyNoteRequest,
   DailyNoteResponse,
   DailyErrorResponse,
 } from "../types/dailynote";
-const JWT_SECRET = process.env.JWT_SECRET_TOKEN!;
+const JWT_SECRET = process.env.JWT_MY_TOKEN!;
 
 export default function authMiddleware(
   req: Request,

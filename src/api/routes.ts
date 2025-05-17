@@ -20,7 +20,7 @@ import {
 import { DailyNote } from "../models/DailyNote";
 dotenv.config();
 const router = Router();
-const JWT_SECRET = process.env.JWT_SECRET_TOKEN!;
+const JWT_SECRET = process.env.JWT_MY_TOKEN!;
 
 router.post(
   "/register",
