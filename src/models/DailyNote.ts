@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { ref } from "process";
 
 const DailyNoteSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },

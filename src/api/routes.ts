@@ -16,8 +16,10 @@ import {
   DailyNoteRequest,
   DailyNoteResponse,
   DailyErrorResponse,
+  DailyNoteResponseGet,
 } from "../types/dailynote";
 import { DailyNote } from "../models/DailyNote";
+import { setgid } from "process";
 dotenv.config();
 const router = Router();
 const JWT_SECRET = process.env.JWT_MY_TOKEN!;
@@ -86,11 +88,6 @@ router.post(
     }
   }
 );
-interface AuthenticatedRequest extends Request<{}, {}, DailyNoteRequest> {
-  user: {
-    userId: string;
-  };
-}
 
 router.post(
   "/daily-note",
@@ -121,6 +118,45 @@ router.post(
     } catch (err) {
       console.error("Günlük kayıt hatası:", err);
       res.status(500).json({ error: "Sunucu hatası" });
+    }
+  }
+);
+router.get(
+  "/getDailyNote",
+  authMiddleware,
+  async (
+    req: Request,
+    res: Response<DailyNoteResponseGet | DailyErrorResponse>
+  ) => {
+    const userId = (req as any).user.userId;
+    const dateQuery = req.query.date as string;
+
+    try {
+      const notes = await DailyNote.find({ userId });
+      const startOfDay = new Date(dateQuery);
+      const endOfDay = new Date(dateQuery);
+      startOfDay.setHours(0, 0, 0, 0);
+      endOfDay.setHours(23, 59, 59, 999);
+      const note = await DailyNote.findOne({
+        userId,
+        date: {
+          $gte: startOfDay,
+          $lt: endOfDay,
+        },
+      });
+      if (!note) {
+        return res.status(404).json({ error: "Günlük notu bulunamadı" });
+      }
+      return res.status(200).json({
+        _id: note._id.toString(),
+        userId: note.userId.toString(),
+        index: note.index,
+        content: note.content,
+        date: note.date.toISOString(),
+        mood: note.mood,
+      });
+    } catch (error) {
+      return res.status(500).json({ error: "Sunucu hatası" });
     }
   }
 );

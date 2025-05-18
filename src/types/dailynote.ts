@@ -11,3 +11,11 @@ export interface DailyNoteResponse {
 export interface DailyErrorResponse {
   error: string;
 }
+export interface DailyNoteResponseGet {
+  _id: string;
+  userId: string;
+  content: string;
+  mood: string;
+  date: string;
+  index: number;
+}
