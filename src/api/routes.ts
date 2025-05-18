@@ -11,6 +11,12 @@ import {
   RegisterResponse,
 } from "../types/auth";
 import authMiddleware from "../middleware/authMiddleware";
+import {
+  DailyDreamRequest,
+  DailyDreamResponse,
+  DailyDreamResponseGet,
+  DailyDreamErrorResponse,
+} from "../types/dailydream";
 
 import {
   DailyNoteRequest,
@@ -20,6 +26,7 @@ import {
 } from "../types/dailynote";
 import { DailyNote } from "../models/DailyNote";
 import { setgid } from "process";
+import { DailyDream } from "../models/DailyDream";
 dotenv.config();
 const router = Router();
 const JWT_SECRET = process.env.JWT_MY_TOKEN!;
@@ -161,4 +168,74 @@ router.get(
   }
 );
 
+router.post(
+  "/dailyDream",
+  authMiddleware,
+  async (
+    req: Request<{}, {}, DailyDreamRequest>,
+    res: Response<DailyDreamResponse | DailyDreamErrorResponse>
+  ) => {
+    const userId = (req as any).user.userId;
+    const { dream, date, mood, index } = req.body;
+    if (!dream || !date || !mood || index === undefined) {
+      return res.status(400).json({ error: "Eksik bilgi" });
+    }
+    console.log("Gelen veri:", req.body);
+
+    try {
+      const newDream = new DailyDream({
+        userId,
+        dream,
+        date: new Date(date),
+        mood,
+        index,
+      });
+      await newDream.save();
+      res.status(201).json({ message: "Rüya kaydedildi", dream: newDream });
+    } catch (error) {
+      console.error("Rüya kayıt hatası:", error);
+      res.status(500).json({ error: "Sunucu hatası" });
+    }
+  }
+);
+
+router.get(
+  "/getDailyDream",
+  authMiddleware,
+  async (
+    req: Request,
+    res: Response<DailyDreamResponseGet | DailyDreamErrorResponse>
+  ) => {
+    const userId = (req as any).user.userId;
+    const dateQuery = req.query.date as string;
+    try {
+      const dreams = await DailyDream.find({ userId });
+      const startOfDay = new Date(dateQuery);
+      const endOfDay = new Date(dateQuery);
+      startOfDay.setHours(0, 0, 0, 0);
+      endOfDay.setHours(23, 59, 59, 999);
+      const dream = await DailyDream.findOne({
+        userId,
+        date: {
+          $gte: startOfDay,
+          $lt: endOfDay,
+        },
+      });
+      if (!dream) {
+        return res.status(404).json({ error: "Rüya notu bulunamadı" });
+      }
+      return res.status(200).json({
+        _id: dream._id.toString(),
+        userId: dream.userId.toString(),
+        index: dream.index,
+        dream: dream.dream,
+        date: dream.date.toISOString(),
+        mood: dream.mood,
+      });
+    } catch (error) {
+      console.error("Rüya notu alma hatası:", error);
+      return res.status(500).json({ error: "Sunucu hatası" });
+    }
+  }
+);
 export default router;
